@@ -8,17 +8,18 @@ exports.main = async (event, callback) => {
 
   let _contactId = event.object.objectId;
   const _companyIds = [];
-  
-  console.log("Contact " + _contactId);
-    await hubspotClient.crm.contacts.associationsApi
+
+  //console.log("Contact " + _contactId);
+
+  await hubspotClient.crm.contacts.associationsApi
     .getAll(_contactId, "company")
     .then((assoc) => {
       //loop through all the company associations for the contact
       for (const _index in assoc.results) {
-		let _primary = 0;
+        let _primary = 0;
         let _companyId = assoc.results[_index].toObjectId;
         let _assocTypes = assoc.results[_index].associationTypes;
-        
+
         for (const _types in _assocTypes) {
           let _assocLabel = _assocTypes[_types].label;
           //check for primary companies
@@ -27,33 +28,34 @@ exports.main = async (event, callback) => {
           }
         }
         //push the non-primary companies in an array
-        if (_primary == 0) {    	_companyIds.push(_companyId.toString());
+        if (_primary == 0) {
+          _companyIds.push(_companyId.toString());
         }
-		
-      } 
-    });
-  
-  console.log("Companies " + JSON.stringify(_companyIds));
-  
-	//Loop through each non-primary
-  	//and remove the associated company
-    //from the contact
-    
-  for (const _company in _companyIds) {
-      const _companyId = _companyIds[_company];
 
-      try {
-        await hubspotClient.crm.contacts.associationsApi.archive(_contactId, 'Company', _companyId);
-      } catch (e) {
-        e.message === 'HTTP request failed'
-          ? console.error(JSON.stringify(e.response, null, 2))
-          : console.error(e)
       }
+    });
+
+  //console.log("Companies " + JSON.stringify(_companyIds));
+
+  //Loop through each non-primary
+  //and remove the associated company
+  //from the contact
+
+  for (const _company in _companyIds) {
+    const _companyId = _companyIds[_company];
+
+    try {
+      await hubspotClient.crm.contacts.associationsApi.archive(_contactId, 'Company', _companyId);
+    } catch (e) {
+      e.message === 'HTTP request failed'
+        ? console.error(JSON.stringify(e.response, null, 2))
+        : console.error(e)
     }
-    
+  }
+
 }
 
-  
+
 
 
 
