@@ -1,0 +1,29 @@
+const hubspot = require('@hubspot/api-client');
+
+exports.main = async (event, callback) => {
+
+  const hubspotClient = new hubspot.Client({
+    accessToken: process.env.Token
+  });
+  const parentcompanyId = event.inputFields['parentcompanyId'];
+  let parentsalesforceId;
+  try {
+    //Get the Salesforce Account ID from the Parent Company
+    const ApiResponse = await hubspotClient.crm.companies.basicApi.getById(parentcompanyId, ["salesforceaccountid"]);
+
+    //Use the Parent Salesforce Account ID and store in the Child Company (new property)
+    //Allow the native data sync from HubSpot to Salesforce sync new property value
+    //Salesforce flow will copy this value into the Account.Parent Account field 
+    parentsalesforceId = ApiResponse.properties.salesforceaccountid; 
+
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+
+  callback({
+    outputFields: {
+      parentsalesforceId: parentsalesforceId
+    }
+  });
+}
