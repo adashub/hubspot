@@ -1,0 +1,34 @@
+{
+  "uid": "HelpDeskTags_app",
+  "type": "app",
+  "config": {
+    "description": "A private app that adds Demo custom object tags to Help Desk ticket sidebars.",
+    "name": "HelpDeskTags",
+    "distribution": "private",
+    "auth": {
+      "type": "static",
+      "requiredScopes": [
+        "oauth",
+        "tickets",
+        "crm.objects.custom.read",
+        "crm.objects.custom.write",
+        "crm.schemas.custom.read"
+      ],
+      "optionalScopes": [],
+      "conditionallyRequiredScopes": []
+    },
+    "permittedUrls": {
+      "fetch": [
+        "https://api.hubapi.com"
+      ],
+      "iframe": [],
+      "img": []
+    },
+    "support": {
+      "supportEmail": "support@example.com",
+      "documentationUrl": "https://developers.hubspot.com/docs/apps/developer-platform/add-features/ui-extensions/extension-points/app-cards/reference",
+      "supportUrl": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/overview",
+      "supportPhone": "+18005555555"
+    }
+  }
+}

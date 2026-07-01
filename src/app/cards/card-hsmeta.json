@@ -1,0 +1,13 @@
+{
+  "uid": "HelpDeskTags_card",
+  "type": "card",
+  "config": {
+    "name": "Demo Tags",
+    "description": "Create or attach Demo custom object records from Help Desk tickets.",
+    "location": "helpdesk.sidebar",
+    "entrypoint": "/app/cards/NewCard.tsx",
+    "objectTypes": [
+      "tickets"
+    ]
+  }
+}
