@@ -1,0 +1,71 @@
+// Associate Companies
+
+const hubspot = require('@hubspot/api-client');
+
+exports.main = async (event, callback) => {
+
+  const hubspotClient = new hubspot.Client({
+    accessToken: process.env.Token
+  });
+  let _parentHubSpotCompanyId = 0;
+  const _childCompanyId = event.object.objectId;
+  
+  const _parentSalesforceAccountId = event.inputFields['salesforce_parent_account_id'];
+  //We have the parent Salesforce Account ID available in the child HubSpot child Company. Search for the parent HubSpot Company using filter parent Salesforce Account ID
+    const PublicObjectSearchRequest = { filterGroups: [{"filters":[{"value":_parentSalesforceAccountId,"propertyName":"salesforceaccountid","operator":"EQ"}]}], sorts: ["name"], properties: ["name"], limit: 1, after: 0 };
+
+  try {
+    const apiResponse = await hubspotClient.crm.companies.searchApi.doSearch(PublicObjectSearchRequest);
+    //console.log("Result " + apiResponse.results[0].id);
+    
+    //Parent HubSpot Company ID
+    _parentHubSpotCompanyId = apiResponse.results[0].id;
+    
+    //Build an association between the Parent-Child Companies
+    //Define the association label based on your portal for Parent Company
+    const AssociationSpec = [
+  {
+    "associationCategory": "HUBSPOT_DEFINED",
+    "associationTypeId": 14 //parent company
+  }
+];
+    
+    const _associateApi = await hubspotClient.crm.companies.associationsApi.create(_childCompanyId, "Companies", _parentHubSpotCompanyId, AssociationSpec);
+    
+  } catch (e) {
+    e.message === 'HTTP request failed'
+      ? console.error(JSON.stringify(e.response, null, 2))
+      : console.error(e)
+  }
+
+  callback({
+    outputFields: {
+      parentHubSpotCompanyId: _parentHubSpotCompanyId
+    }
+  });
+}
+
+
+//Remove Company Association
+const hubspot = require('@hubspot/api-client');
+
+exports.main = async (event, callback) => {
+
+  const hubspotClient = new hubspot.Client({
+    accessToken: process.env.Token
+  });
+
+ 	const companyId = event.object.objectId;
+  const toObjectType = "Companies";
+  const toObjectId = event.inputFields['parentcompanyId'];
+
+  try {
+    const apiResponse = await hubspotClient.crm.companies.associationsApi.archive(companyId, toObjectType, toObjectId);
+ 
+  } catch (e) {
+    e.message === 'HTTP request failed'
+      ? console.error(JSON.stringify(e.response, null, 2))
+      : console.error(e)
+  }
+  
+}
